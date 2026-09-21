@@ -163,15 +163,18 @@
 
   /* ---------------- hero ---------------- */
   #hero { min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; padding: 130px 0 90px; }
-  .hero-inner { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 28px; display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 48px; align-items: end; }
+  .hero-inner { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 28px; display: grid; grid-template-columns: minmax(0, 1fr) 370px; column-gap: 48px; row-gap: 8px; align-items: end; }
+  .hero-head { grid-column: 1 / -1; min-width: 0; }
+  .hero-left { min-width: 0; }
   .kicker { font-family: var(--f-mono); font-size: 13px; color: var(--dim); display: flex; align-items: center; gap: 10px; margin: 0; opacity: 0; transition: opacity .8s ease .9s; }
   .loaded .kicker { opacity: 1; }
   .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); position: relative; flex: none; }
   .live-dot::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid var(--ok); animation: ping 2s ease-out infinite; }
   @keyframes ping { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.8); opacity: 0; } }
 
-  .hero-name { font-family: var(--f-display); font-weight: 800; font-size: clamp(64px, 11.5vw, 178px); line-height: 0.86; letter-spacing: -0.035em; margin: 22px 0 30px; }
-  .hero-name .line { display: block; overflow: hidden; padding: 0.02em 0 0.06em; }
+  .hero-name { font-family: var(--f-display); font-weight: 800; font-size: min(200px, calc((100vw - 56px) / 5)); line-height: 0.86; letter-spacing: -0.035em; margin: 22px 0 30px; white-space: nowrap; }
+  .hero-name .line { display: block; overflow: hidden; padding: 0.02em 0 0.06em; white-space: nowrap; }
+  .hero-name .split { display: inline-block; }
   .hero-name .outline .ch { color: transparent; -webkit-text-stroke: 1.5px var(--paper); }
   .c { display: inline-block; transform: translateY(115%) rotate(8deg); }
   .loaded .c { animation: cIn 1.2s cubic-bezier(.16, 1, .3, 1) forwards; animation-delay: calc(0.08s + var(--ci) * 55ms); }
@@ -366,12 +369,14 @@
 
 <section id="hero" data-shape="0" data-pos="hero">
   <div class="hero-inner">
-    <div>
+    <div class="hero-head">
       <p class="kicker"><span class="live-dot"></span>Open to new roles and freelance projects</p>
       <h1 class="hero-name" aria-label="Nitish Tiwari">
         <span class="line" aria-hidden="true"><span class="split">Nitish</span></span>
         <span class="line outline" aria-hidden="true"><span class="split">Tiwari</span></span>
       </h1>
+    </div>
+    <div class="hero-left">
       <p class="hero-build">I build <span class="phrase" id="phrase">Flutter apps for 5M+ policyholders</span></p>
       <div class="hero-ctas">
         <a class="btn primary mag" href="#projects">See the work</a>
@@ -1053,6 +1058,22 @@
       o.appendChild(n); el.appendChild(o);
     }
   });
+
+  var heroName = document.querySelector('.hero-name');
+  function fitName() {
+    if (!heroName) return;
+    heroName.style.fontSize = '';
+    var avail = heroName.clientWidth, widest = 0;
+    heroName.querySelectorAll('.split').forEach(function (s) { widest = Math.max(widest, s.getBoundingClientRect().width); });
+    if (widest > avail && widest > 0) {
+      var fs = parseFloat(getComputedStyle(heroName).fontSize);
+      heroName.style.fontSize = Math.floor(fs * (avail / widest) * 0.98) + 'px';
+    }
+  }
+  fitName();
+  window.addEventListener('resize', fitName);
+  window.addEventListener('load', fitName);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
 
   /* ---------- scramble ---------- */
   var GLYPHS = '!<>-_\\/[]{}=+*^?#01';
